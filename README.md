@@ -8,7 +8,7 @@ This extension can configure scripts to help you simplify frequently used operat
 * Run configured `ShellScript`
 * Run configured `ShellScript` in `TERMINAL`
 
-![Sample](images/pVQpSVIAkt.gif)
+![Sample](https://github.com/rins-dev/vscode-pickcommand/raw/main/images/pVQpSVIAkt.gif)
 
 This extension provides a basic configuration for Windows user (if you are a linux/mac user, you can also refer it to understand the basic functionality and can simply modify it to linux/mac style) to:
 
@@ -214,7 +214,7 @@ Custom constant context can be defined in the `pickcommand.constant` configurati
 > Note: Constant context is for performance reasons. If you don't focus on performance, you can also define functions in context instead of using constant context. When you try to write a new command configuration, you can define it as context and then move the required to constant.
 
 > Tip: You can also save the value by defining an object in constant context and assigning a value to the members of the variable in the context by pickcommand.runInJs command.
-> You can find the relevant examples in the description of [pickcommand.createCommand](#pickcommand.createCommand).
+> You can find the relevant examples in the description of [pickcommand.createCommand](#pickcommandcreateCommand).
 > However, that the saved value will disappear after reloading vscode window, or after modifying the `pickcommand.constant` configuration.
 
 ## The configuration value
@@ -225,12 +225,12 @@ When you are writing configuration, you need to understand the special syntax wi
 
 When you use strings in configuration values, you need to realize that when you configure strings that contain `{{` and `}}`, The content between will be replaced as a variable. When this string starts with `{{` and ends with `}}`, its value may not be a string, but the type of variable. If the variable type is a `Promise`, it will waits for the task complete and returns the value of `await`.
 
-```json
+```jsonc
 // Get text from the clipboard. The return type of vscode.env.clipboard.readText() is Promise<string>, so the CURRENT_CLIPBOARD_TEXT is a string type
 "CURRENT_CLIPBOARD_TEXT": "{{vscode.env.clipboard.readText()}}",
 ```
 
-> Tip: The extension doesn't provide escapes for `{{` or `}}`, you can use [pickcommand.runInJs](#pickcommand.runInJs) bacause it doesn't support variable expressions.
+> Tip: The extension doesn't provide escapes for `{{` or `}}`, you can use [pickcommand.runInJs](#pickcommandrunInJs) bacause it doesn't support variable expressions.
 
 ### Command object
 
@@ -238,7 +238,7 @@ When configured as an object and contains the `command` field, we call it **comm
 
 * Pickable Command
 
-    Command objects defined in `pickcommand.commands` configuration or in `commands` of `pickcommand.showCommands` will display a list of matching commands, and execute after user picks. The valid fields can be found in [PickCommandOptions](#PickCommandOptions) in [Built-in Command Interface](#内置命令接口). Although pickable commands also have a return value, but usually don't need to notice.
+    Command objects defined in `pickcommand.commands` configuration or in `commands` of `pickcommand.showCommands` will display a list of matching commands, and execute after user picks. The valid fields can be found in [PickCommandOptions](#PickCommandOptions) in [Built-in Command Interface](#Built-in-Command-Interface). Although pickable commands also have a return value, but usually don't need to notice.
 
 * Callable command
 
@@ -252,11 +252,11 @@ The following table lists the built-in commands for this extension. You can use 
 
 |Built-in command|Description|
 |----|---|
-|[pickcommand.runInJs](#pickcommand.runInJs)|Run javascript and return the result of execution.|
-|[pickcommand.runInTerminal](#pickcommand.runInTerminal)|Execute the script in terminal and return the terminal object.|
-|[pickcommand.runInChildProcess](#pickcommand.runInChildProcess)|Execute the shell script, return the standard output of the script.|
-|[pickcommand.showCommands](#pickcommand.showCommands)|Group commands, will show matching commands. When picking a command, this command will execute and returns the result of execution.|
-|[pickcommand.createCommand](#pickcommand.createCommand)|Similar to the usage of functions, returns the command object defined in value that can be explicitly called and repeatedly called are returned. Usually used only in context.|
+|[pickcommand.runInJs](#pickcommandrunInJs)|Run javascript and return the result of execution.|
+|[pickcommand.runInTerminal](#pickcommandrunInTerminal)|Execute the script in terminal and return the terminal object.|
+|[pickcommand.runInChildProcess](#pickcommandrunInChildProcess)|Execute the shell script, return the standard output of the script.|
+|[pickcommand.showCommands](#pickcommandshowCommands)|Group commands, will show matching commands. When picking a command, this command will execute and returns the result of execution.|
+|[pickcommand.createCommand](#pickcommandcreateCommand)|Similar to the usage of functions, returns the command object defined in value that can be explicitly called and repeatedly called are returned. Usually used only in context.|
 
 You can also use any command provided by vscode. However, they generally do not have a return value and are usually used as pickable commands.
 
@@ -303,7 +303,7 @@ There are many items have same usage when configuring command. When you encounte
     |----|----|-----|----|
     |script|null\|string\|string[]|Required|The script will be executed. When used as string[], will join with `\n`|
 
-    ```json
+    ```jsonc
     "ACTIVE_EDITOR_SELECTED_TEXT": {
         "command":"pickcommand.runInJs",
         // Same as "script": "let editor = vscode.window.activeTextEditor;\\nreturn editor.selections.map(x => editor.document.getText(x.with()));"
@@ -386,18 +386,18 @@ There are many items have same usage when configuring command. When you encounte
 
     1. Add a global constant object, then you can use it to save environment between different commands.
 
-    ```json
+    ```jsonc
     "pickcommand.constant": {
-        ...
+        //...
         "DOCKER_ENV": {}
     }
     ```
 
     2. Add following command group to your commands settings.
 
-    ```json
+    ```jsonc
     "pickcommand.commands": {
-        ...
+        //...
         "Docker Container": {
             "command":"pickcommand.showCommands",
             "commands": {
