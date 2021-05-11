@@ -208,29 +208,46 @@ export class ContextHelper {
     }
     
     static async reloadConstantContext() {
-        let context: CommandContext = {};
+        let context: any = {};
         context.CURRENT_PLATFORM = os.platform();
  
-        context.log = (x: any) => ExtensionHelper.log(x);
-        context.cancel = (message?: string) => { throw new CommandError(message); };
-        context.defined = (x: any, message?: string) => {
-            if (x === undefined) {
-                (context as any).cancel(message);
-            }
-            return x;
+        context.log = (x: any): void => ExtensionHelper.log(x);
+        context.cancel = (message?: string): never => { throw new CommandError(message); };
+        context.defined = <T>(x: T, message?: string): never | T => {
+            if (x === undefined) { return context.cancel(message); } else { return x; }
         };
-        context.basename = (x: vscode.Uri|string) => path.basename(x instanceof vscode.Uri ? x.fsPath: x);
-        context.dirname = (x: vscode.Uri|string) => path.dirname(x instanceof vscode.Uri ? x.fsPath: x);
-        context.fileExists = (x: vscode.Uri|string) => fs.existsSync(x instanceof vscode.Uri ? x.fsPath: x);
-        context.filetype = async (x: vscode.Uri|string) => {
+        
+        context.asUri = (x: vscode.Uri|string): vscode.Uri => x instanceof vscode.Uri ? x: vscode.Uri.file(x);
+        context.asPath = (x: vscode.Uri|string): string => x instanceof vscode.Uri ? x.fsPath: x;
+
+        context.basename = (x: vscode.Uri|string): string => path.basename(context.asPath(x));
+        context.dirname = (x: vscode.Uri|string): string => path.dirname(context.asPath(x));
+        context.fileExists = (x: vscode.Uri|string): boolean => fs.existsSync(context.asPath(x));
+        context.filetype = async (x: vscode.Uri|string): Promise<"DIRECTORY" | "FILE" | undefined> => {
             try {
-                let stat = await vscode.workspace.fs.stat(x instanceof vscode.Uri ? x : vscode.Uri.file(x)); 
+                let stat = await vscode.workspace.fs.stat(context.asUri(x)); 
                 if (stat.type & vscode.FileType.Directory) { return 'DIRECTORY';}
                 else if (stat.type & vscode.FileType.File) { return 'FILE'; } 
                 else { return undefined; } 
             } catch (err) { 
                 return undefined; 
             }
+        };
+
+        context.showInputBox = async (options?: vscode.InputBoxOptions): Promise<string> => context.defined(await vscode.window.showInputBox(options));
+        context.showQuickPick = async (items: vscode.QuickPickItem[], options?: vscode.QuickPickOptions) => context.defined(await vscode.window.showQuickPick(items, options));
+        
+        context.openExternal = async (x: vscode.Uri|string): Promise<boolean> => vscode.env.openExternal(context.asUri(x));
+        context.showTextDocument = async (doc: vscode.TextDocument | Promise<vscode.TextDocument>, language?: string): Promise<vscode.TextEditor> => {
+            if (doc instanceof Promise) { doc = await doc; }
+            if (language !== undefined) { doc = await vscode.languages.setTextDocumentLanguage(doc, language); }
+            return vscode.window.showTextDocument(doc);
+        };
+        context.openInternal = async (x: vscode.Uri|string, language?: string): Promise<vscode.TextEditor> => {
+            return context.showTextDocument(vscode.workspace.openTextDocument(context.asUri(x)), language);
+        };
+        context.openTextEditor = async (content: string, language?: string): Promise<vscode.TextEditor> => {
+            return context.showTextDocument(vscode.workspace.openTextDocument({content}), language);
         };
 
         let configContext = configManager.getConstantContext();

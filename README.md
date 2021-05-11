@@ -35,16 +35,14 @@ Please copy the following configuration to your settings. If you don't need some
                 "return editor.selections.map(x => editor.document.getText(x.with())).join(' ');"
             ],
             "when": "{{vscode.window.activeTextEditor}}"
-        },
-        "showInputBox": "{{async (options) => context.defined(await vscode.window.showInputBox(options))}}",
-        "showQuickPick": "{{async (items, options) => context.defined(await vscode.window.showQuickPick(items, options))}}",
+        }
     },
     "pickcommand.commands": {
         "Open selected file": {
             "command": "pickcommand.runInJs",
             "when": "{{context.SELECTED_FILE}}",
             "detail": "{{context.basename(context.SELECTED_FILE)}}",
-            "script": "vscode.env.openExternal(context.SELECTED_FILE)",
+            "script": "context.openExternal(context.SELECTED_FILE)",
             "priority": 101
         },
         "Compare selected files": {
@@ -64,7 +62,7 @@ Please copy the following configuration to your settings. If you don't need some
                 },
                 "Open Favorite File": {
                     "command":"pickcommand.runInJs",
-                    "script": "vscode.window.showTextDocument(vscode.Uri.file(context.SELECTED_FAVORITE_FILE.detail))",
+                    "script": "context.openInternal(context.SELECTED_FAVORITE_FILE.detail)",
                     "context": {
                         "FAVORITE_FILES": [
                             {
@@ -201,13 +199,21 @@ The following table lists the built-in constant context.
 |Name|Type|Description|
 |-------------------|---------------|-------|
 |CURRENT_PLATFORM|string|Get the platform for the current operating system. Specific values can be referenced by [process.platform](https://nodejs.org/dist/latest-v14.x/docs/api/process.html#process_process_platform)|
-|log|(text: any) => void|Prints log for debugging. When you activate the extension, you can view outputs on the PickCommand option in OUTPUT view.|
-|cancel|(message?: string) => void|Exits current command directly. It will showErrorMessage when message is set.|
-|defined|(x: any, message?: string) => any|When x is undefined, call `context.cancel(message)`. Otherwise, return x. |
-|basename|(uri: vscode.Uri\|string) => string|Returns the file name.|
-|dirname|(uri: vscode.Uri\|string) => string|Returns the directory name.|
-|fileExists|(uri: vscode.Uri\|string) => boolean|Checks whether the file exists.|
-|fileType|async (uri: vscode.Uri\|string) => Promise<'DIRECTORY'\|'FILE'\|undefined>|Returns file type.|
+|log|`(x: any): void`|Prints log for debugging. When you activate the extension, you can view outputs on the PickCommand option in OUTPUT view.|
+|cancel|`(message?: string): void`|Exits current command directly. It will showErrorMessage when message is set.|
+|defined|`(x: any, message?: string): any`|When x is undefined, call `context.cancel(message)`. Otherwise, return x. |
+|basename|`(uri: vscode.Uri|string): string`|Returns the file name.|
+|dirname|`(uri: vscode.Uri|string): string`|Returns the directory name.|
+|fileExists|`(uri: vscode.Uri|string): boolean`|Checks whether the file exists.|
+|filetype|`async (uri: vscode.Uri|string): Promise<'DIRECTORY'|'FILE'|undefined>`|Returns file type.|
+|asUri|`(uri: vscode.Uri|string): vscode.Uri`|Returns Uri for a file path.|
+|asPath|`(uri: vscode.Uri|string): string`|Returns fsPath for the Uri.|
+|showInputBox|`async (options?: vscode.InputBoxOptions): Promise<string>`|Same as `vscode.window.showInputBox`, but will auto call `context.cancel()` when `undefined`.|
+|showQuickPick|`async (items: vscode.QuickPickItem[]|string[], options?: vscode.QuickPickOptions): Promise<vscode.QuickPickItem|string>`|Same as `vscode.window.showQuickPick`, but will auto call `context.cancel()` when `undefined`.|
+|showTextDocument|`async (doc: vscode.TextDocument | Promise<vscode.TextDocument>, language?: string): Promise<vscode.TextEditor>`|Show document with specific language.|
+|openExternal|`async (uri: vscode.Uri|string): Promise<boolean>`|Same as `vscode.env.openExternal`.|
+|openInternal|`async (uri: vscode.Uri|string, language?: string): Promise<vscode.TextEditor>`|Open file in vscode with specific language.|
+|openTextEditor|`async (content: string, language?: string): Promise<vscode.TextEditor>`|Create untitled file in vscode with specific language.|
 
 Custom constant context can be defined in the `pickcommand.constant` configuration.
 
