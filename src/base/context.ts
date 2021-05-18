@@ -188,19 +188,24 @@ export class ContextHelper {
         
 
         context.CURRENT_ARGUMENTS = args;
+        ExtensionHelper.trace(`Context: CURRENT_ARGUMENTS`, context.CURRENT_ARGUMENTS);
         
          // USED for explorer/context & editor/title/context
         if (args.length > 0 && args[0] instanceof vscode.Uri) {
             context.SELECTED_FILE = args[0];
+            ExtensionHelper.trace(`Context: SELECTED_FILE`, context.SELECTED_FILE);
         }
         // USED for explorer/context
         if (args.length > 1 && args[1] instanceof Array) {
             context.SELECTED_FILES = ContextHelper.getUriResource(args[1]);
+            ExtensionHelper.trace(`Context: SELECTED_FILES`, context.SELECTED_FILES);
         }
         // USED for scm/resourceState/context & scm/resourceFolder/context
         if (args.length > 0 && OptionsHelper.isScmResource(args[0])) {
             context.SELECTED_FILE = args[0].resourceUri;
+            ExtensionHelper.trace(`Context: SELECTED_FILE`, context.SELECTED_FILE);
             context.SELECTED_FILES = ContextHelper.getUriResource(args.map(x => (x as ScmResource).resourceUri));
+            ExtensionHelper.trace(`Context: SELECTED_FILES`, context.SELECTED_FILES);
         }
 
         await ContextHelper.readOptionContext(evalCtx, configManager.getCommandContext());
