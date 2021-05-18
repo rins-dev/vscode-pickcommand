@@ -25,7 +25,7 @@ Please copy the following configuration to your settings. If you don't need some
 {
     "pickcommand.constant": {
         "COMPARE_TOOL": "C:\\Program Files (x86)\\Beyond Compare 3\\BCompare.exe",
-        "SHELL_PATH_BASH": "C:\\Program Files\\Git\\bin\\bash.exe",
+        "SHELL_PATH_BASH": "C:\\Program Files\\Git\\bin\\bash.exe"
     },
     "pickcommand.context": {
         "ACTIVE_EDITOR_SELECTED_TEXT": {
@@ -35,7 +35,8 @@ Please copy the following configuration to your settings. If you don't need some
                 "return editor.selections.map(x => editor.document.getText(x.with())).join(' ');"
             ],
             "when": "{{vscode.window.activeTextEditor}}"
-        }
+        },
+        "CURRENT_Clipboard_TEXT": "{{vscode.env.clipboard.readText()}}"
     },
     "pickcommand.commands": {
         "Open selected file": {
@@ -52,17 +53,34 @@ Please copy the following configuration to your settings. If you don't need some
             "script": "START \"\" \"{{context.COMPARE_TOOL}}\" \"{{context.SELECTED_FILES[0].fsPath}}\" \"{{context.SELECTED_FILES[1].fsPath}}\"",
             "priority": 102
         },
-        "Shortcut1 Group": {
+        "Open User Settings(JSON)": {
+            "command": "pickcommand.runInJs",
+            "script": "vscode.commands.executeCommand('workbench.action.openSettingsJson')",
+            "priority": 0
+        },
+        "Favorite Command Group": {
             "command":"pickcommand.showCommands",
-            "priority": -1,
             "commands": {
-                "Transform to uppercase": {
-                    "command": "editor.action.transformToUppercase",
-                    "when": "{{context.ACTIVE_EDITOR_SELECTED_TEXT}}"
+                "Call Favorite Command": {
+                    "command": "pickcommand.runInJs",
+                    "script": "vscode.commands.executeCommand(context.SELECTED_COMMAND.detail, ...context.CURRENT_ARGUMENTS)",
+                    "context": {
+                        "FAVORITE_COMMANDS": [
+                            {
+                                "label": "Transform to uppercase",
+                                "detail": "editor.action.transformToUppercase"
+                            },
+                            {
+                                "label": "Transform to lowercase",
+                                "detail": "editor.action.transformToLowercase"
+                            }
+                        ],
+                        "SELECTED_COMMAND": "{{context.showQuickPick(context.FAVORITE_COMMANDS)}}"
+                    }
                 },
                 "Open Favorite File": {
                     "command":"pickcommand.runInJs",
-                    "script": "context.openInternal(context.SELECTED_FAVORITE_FILE.detail)",
+                    "script": "context.openInternal(context.SELECTED_FILE.detail)",
                     "context": {
                         "FAVORITE_FILES": [
                             {
@@ -74,12 +92,12 @@ Please copy the following configuration to your settings. If you don't need some
                                 "detail": "/etc/hosts"
                             }
                         ],
-                        "SELECTED_FAVORITE_FILE": "{{context.showQuickPick(context.FAVORITE_FILES.filter(x => context.fileExists(x.detail)))}}"
+                        "SELECTED_FILE": "{{context.showQuickPick(context.FAVORITE_FILES.filter(x => context.fileExists(x.detail)))}}"
                     }
                 },
                 "Execute Favorite Script": {
                     "command":"pickcommand.runInTerminal",
-                    "script": "{{context.SELECTED_FAVORITE_SCRIPT.detail}}",
+                    "script": "{{context.SELECTED_SCRIPT.detail}}",
                     "when": "{{vscode.window.activeTerminal}}",
                     "context": {
                         "FAVORITE_SCRIPTS": [
@@ -88,7 +106,7 @@ Please copy the following configuration to your settings. If you don't need some
                                 "detail": "vi /etc/hosts"
                             }
                         ],
-                        "SELECTED_FAVORITE_SCRIPT": "{{context.showQuickPick(context.FAVORITE_SCRIPTS)}}"
+                        "SELECTED_SCRIPT": "{{context.showQuickPick(context.FAVORITE_SCRIPTS)}}"
                     }
                 },
                 "Create SSH Terminal": {
@@ -120,11 +138,11 @@ Please copy the following configuration to your settings. If you don't need some
                         }
                     },
                     "terminal": "{{vscode.window.createTerminal(context.TERMINAL_OPTIONS)}}"
-                },
+                }
             }
         }
     },
-    "pickcommand.shortcut1": "Shortcut1 Group",
+    "pickcommand.shortcut1": "Favorite Command Group"
 }
 ```
 
