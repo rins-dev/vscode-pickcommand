@@ -2,7 +2,7 @@
 	"name": "pickcommand",
 	"displayName": "PickCommand",
 	"description": "Easy to run configured scripts with quick pick.",
-	"version": "0.1.2",
+	"version": "0.1.3",
 	"publisher": "rins",
 	"repository":{
 		"url": "https://github.com/rins-dev/vscode-pickcommand"
