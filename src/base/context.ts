@@ -32,7 +32,7 @@ export class ContextHelper {
             if (err instanceof CommandError) {
                 throw err;
             } else {
-                throw new Error(`Evaluate with error:\n${original}\n${err.message}`);
+                throw new Error(`Evaluate with error:\n${original}\n${(err as Error).message}`);
             }
         }
     }
@@ -172,40 +172,48 @@ export class ContextHelper {
 
 
     private static getUriResource(uris: unknown[]): vscode.Uri[]|undefined {
-        for (const uri of uris) {
-            if (!(uri instanceof vscode.Uri)) {
-                return undefined;
-            }
+        if (uris.some(x => !(x instanceof vscode.Uri))) {
+            return undefined;
         }
         return uris as vscode.Uri[];
     }
 
+    private static isUriArray(value: unknown): value is vscode.Uri[] {
+        return !(value instanceof Array) || value.some(x => !(x instanceof vscode.Uri));
+    }
 
     static async createContext(args: unknown[]) {
         let context: CommandContext = Object.assign({}, constantContext);
 
         let evalCtx: EvalContext = {context};
         
-
         context.CURRENT_ARGUMENTS = args;
+        context.SELECTED_FILE = undefined;
+        context.SELECTED_FILES = undefined;
+
         ExtensionHelper.trace(`Context: CURRENT_ARGUMENTS`, context.CURRENT_ARGUMENTS);
         
-         // USED for explorer/context & editor/title/context
-        if (args.length > 0 && args[0] instanceof vscode.Uri) {
-            context.SELECTED_FILE = args[0];
-            ExtensionHelper.trace(`Context: SELECTED_FILE`, context.SELECTED_FILE);
-        }
-        // USED for explorer/context
-        if (args.length > 1 && args[1] instanceof Array) {
-            context.SELECTED_FILES = ContextHelper.getUriResource(args[1]);
-            ExtensionHelper.trace(`Context: SELECTED_FILES`, context.SELECTED_FILES);
-        }
-        // USED for scm/resourceState/context & scm/resourceFolder/context
-        if (args.length > 0 && OptionsHelper.isScmResource(args[0])) {
-            context.SELECTED_FILE = args[0].resourceUri;
-            ExtensionHelper.trace(`Context: SELECTED_FILE`, context.SELECTED_FILE);
-            context.SELECTED_FILES = ContextHelper.getUriResource(args.map(x => (x as ScmResource).resourceUri));
-            ExtensionHelper.trace(`Context: SELECTED_FILES`, context.SELECTED_FILES);
+        if (args.length > 0) {
+            if (args[0] instanceof vscode.Uri) {
+                // USED for explorer/context & editor/title/context
+                context.SELECTED_FILE = args[0];
+                ExtensionHelper.trace(`Context: SELECTED_FILE`, context.SELECTED_FILE);
+    
+                // USED for explorer/context
+                if (args.length > 1 && ContextHelper.isUriArray(args[1])) {
+                    context.SELECTED_FILES = args[1];
+                    ExtensionHelper.trace(`Context: SELECTED_FILES`, context.SELECTED_FILES);
+                }
+            } else if (OptionsHelper.isScmResource(args[0])) {
+                // USED for scm/resourceState/context & scm/resourceFolder/context
+                context.SELECTED_FILE = args[0].resourceUri;
+                ExtensionHelper.trace(`Context: SELECTED_FILE`, context.SELECTED_FILE);
+                let uris = args.map(x => (x as ScmResource).resourceUri);
+                if (ContextHelper.isUriArray(uris)) {
+                    context.SELECTED_FILES = uris;
+                    ExtensionHelper.trace(`Context: SELECTED_FILES`, context.SELECTED_FILES);
+                }
+            }
         }
 
         await ContextHelper.readOptionContext(evalCtx, configManager.getCommandContext());

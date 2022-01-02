@@ -43,8 +43,8 @@ export class ExtensionHelper {
                 if (err instanceof CommandError && !err.message) {
                     ExtensionHelper.log(`Execute command [${command}] with CANCELLED`);
                 } else {
-                    vscode.window.showErrorMessage(err.message);
-                    ExtensionHelper.log(`Execute command [${command}] with ERROR`, err);
+                    vscode.window.showErrorMessage((err as Error).message);
+                    ExtensionHelper.log(`Execute command [${command}] with ERROR`, err as Error);
                 }
             }
         };
