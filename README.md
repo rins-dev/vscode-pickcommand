@@ -175,8 +175,8 @@ This extension contributes the following settings:
 
 |Name|Description|
 |---|---|
-|`pickcommand.context`|Configure context variables used for all commands.|
 |`pickcommand.constant`|Configure constant context variables used for all commands.|
+|`pickcommand.context`|Configure context variables used for all commands.|
 |`pickcommand.commands`|Configure all commands.|
 |`pickcommand.shortcut[1-9]`|Configure shortcut commands. You need to specify the key in `pickcommand.commands`.|
 
@@ -220,17 +220,17 @@ The following table lists the built-in constant context.
 |log|`(x: any): void`|Prints log for debugging. When you activate the extension, you can view outputs on the PickCommand option in OUTPUT view.|
 |cancel|`(message?: string): void`|Exits current command directly. It will showErrorMessage when message is set.|
 |defined|`(x: any, message?: string): any`|When x is undefined, call `context.cancel(message)`. Otherwise, return x. |
-|basename|`(uri: vscode.Uri|string): string`|Returns the file name.|
-|dirname|`(uri: vscode.Uri|string): string`|Returns the directory name.|
-|fileExists|`(uri: vscode.Uri|string): boolean`|Checks whether the file exists.|
-|filetype|`async (uri: vscode.Uri|string): Promise<'DIRECTORY'|'FILE'|undefined>`|Returns file type.|
-|asUri|`(uri: vscode.Uri|string): vscode.Uri`|Returns Uri for a file path.|
-|asPath|`(uri: vscode.Uri|string): string`|Returns fsPath for the Uri.|
+|basename|`(uri: vscode.Uri\|string): string`|Returns the file name.|
+|dirname|`(uri: vscode.Uri\|string): string`|Returns the directory name.|
+|fileExists|`(uri: vscode.Uri\|string): boolean`|Checks whether the file exists.|
+|filetype|`async (uri: vscode.Uri\|string): Promise<'DIRECTORY'\|'FILE'\|undefined>`|Returns file type.|
+|asUri|`(uri: vscode.Uri\|string): vscode.Uri`|Returns Uri for a file path.|
+|asPath|`(uri: vscode.Uri\|string): string`|Returns fsPath for the Uri.|
 |showInputBox|`async (options?: vscode.InputBoxOptions): Promise<string>`|Same as `vscode.window.showInputBox`, but will auto call `context.cancel()` when `undefined`.|
-|showQuickPick|`async (items: vscode.QuickPickItem[]|string[], options?: vscode.QuickPickOptions): Promise<vscode.QuickPickItem|string>`|Same as `vscode.window.showQuickPick`, but will auto call `context.cancel()` when `undefined`.|
-|showTextDocument|`async (doc: vscode.TextDocument | Promise<vscode.TextDocument>, language?: string): Promise<vscode.TextEditor>`|Show document with specific language.|
-|openExternal|`async (uri: vscode.Uri|string): Promise<boolean>`|Same as `vscode.env.openExternal`.|
-|openInternal|`async (uri: vscode.Uri|string, language?: string): Promise<vscode.TextEditor>`|Open file in vscode with specific language.|
+|showQuickPick|`async (items: vscode.QuickPickItem[]\|string[], options?: vscode.QuickPickOptions): Promise<vscode.QuickPickItem\|string>`|Same as `vscode.window.showQuickPick`, but will auto call `context.cancel()` when `undefined`.|
+|showTextDocument|`async (doc: vscode.TextDocument \| Promise<vscode.TextDocument>, language?: string): Promise<vscode.TextEditor>`|Show document with specific language.|
+|openExternal|`async (uri: vscode.Uri\|string): Promise<boolean>`|Same as `vscode.env.openExternal`.|
+|openInternal|`async (uri: vscode.Uri\|string, language?: string): Promise<vscode.TextEditor>`|Open file in vscode with specific language.|
 |openTextEditor|`async (content: string, language?: string): Promise<vscode.TextEditor>`|Create untitled file in vscode with specific language.|
 
 Custom constant context can be defined in the `pickcommand.constant` configuration.
