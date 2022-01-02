@@ -170,18 +170,6 @@ export class ContextHelper {
         }
     }
 
-
-    private static getUriResource(uris: unknown[]): vscode.Uri[]|undefined {
-        if (uris.some(x => !(x instanceof vscode.Uri))) {
-            return undefined;
-        }
-        return uris as vscode.Uri[];
-    }
-
-    private static isUriArray(value: unknown): value is vscode.Uri[] {
-        return !(value instanceof Array) || value.some(x => !(x instanceof vscode.Uri));
-    }
-
     static async createContext(args: unknown[]) {
         let context: CommandContext = Object.assign({}, constantContext);
 
@@ -200,7 +188,7 @@ export class ContextHelper {
                 ExtensionHelper.trace(`Context: SELECTED_FILE`, context.SELECTED_FILE);
     
                 // USED for explorer/context
-                if (args.length > 1 && ContextHelper.isUriArray(args[1])) {
+                if (args.length > 1 && OptionsHelper.isUriArray(args[1])) {
                     context.SELECTED_FILES = args[1];
                     ExtensionHelper.trace(`Context: SELECTED_FILES`, context.SELECTED_FILES);
                 }
@@ -209,7 +197,7 @@ export class ContextHelper {
                 context.SELECTED_FILE = args[0].resourceUri;
                 ExtensionHelper.trace(`Context: SELECTED_FILE`, context.SELECTED_FILE);
                 let uris = args.map(x => (x as ScmResource).resourceUri);
-                if (ContextHelper.isUriArray(uris)) {
+                if (OptionsHelper.isUriArray(uris)) {
                     context.SELECTED_FILES = uris;
                     ExtensionHelper.trace(`Context: SELECTED_FILES`, context.SELECTED_FILES);
                 }

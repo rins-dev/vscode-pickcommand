@@ -60,4 +60,8 @@ export class OptionsHelper {
         }
         return false;
     }
+
+    static isUriArray(value: unknown): value is vscode.Uri[] {
+        return !(value instanceof Array) || value.some(x => !(x instanceof vscode.Uri));
+    }
 }
