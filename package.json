@@ -14,303 +14,48 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:pickcommand.pickAllCommand",
-		"onCommand:pickcommand.pickDefaultCommand",
-		"onCommand:pickcommand.shortcut1",
-		"onCommand:pickcommand.shortcut2",
-		"onCommand:pickcommand.shortcut3",
-		"onCommand:pickcommand.shortcut4",
-		"onCommand:pickcommand.shortcut5",
-		"onCommand:pickcommand.shortcut6",
-		"onCommand:pickcommand.shortcut7",
-		"onCommand:pickcommand.shortcut8",
-		"onCommand:pickcommand.shortcut9"
+		"onCommand:pickcommand.commands"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"configuration": {
 			"title": "PickCommand",
 			"properties": {
-				"pickcommand.constant": {
-					"type": "object",
-					"markdownDescription": "The constant context used for all commands.",
-					"propertyNames": {
-						"pattern": "^[_a-zA-Z][_0-9a-zA-Z]*$"
-					}
-				},
-				"pickcommand.context": {
-					"type": "object",
-					"markdownDescription": "The context used for all commands.",
-					"propertyNames": {
-						"pattern": "^[_a-zA-Z][_0-9a-zA-Z]*$"
-					}
-				},
-				"pickcommand.commands": {
-					"type": "object",
-					"markdownDescription": "Command Definitions",
-					"additionalProperties": {
-						"type": "object",
-						"properties": {
-							"command": {
-								"type": "string",
-								"markdownDescription": "The command will be executed. It also could be command for vscode.",
-								"examples": [
-									"pickcommand.runInChildProcess",
-									"pickcommand.runInJs",
-									"pickcommand.runInTerminal",
-									"pickcommand.showCommands",
-									"pickcommand.createCommand"
-								]
-							},
-							"when": {
-								"default": true,
-								"markdownDescription": "The condition for current command."
-							},
-							"context": {
-								"default": {},
-								"markdownDescription": "The context used for current command."
-							},
-							"label": {
-								"markdownDescription": "You can refer to [vscode.QuickPickItem](https://code.visualstudio.com/api/references/vscode-api#QuickPickItem) for more information."
-							},
-							"description": {
-								"markdownDescription": "You can refer to [vscode.QuickPickItem](https://code.visualstudio.com/api/references/vscode-api#QuickPickItem) for more information."
-							},
-							"detail": {
-								"markdownDescription": "You can refer to [vscode.QuickPickItem](https://code.visualstudio.com/api/references/vscode-api#QuickPickItem) for more information."
-							},
-							"priority": {
-								"type": "number",
-								"default": 100,
-								"markdownDescription": "The sort priority of the commands. The bigger one comes first."
-							}
-						},
-						"required": [
-							"command"
-						],
-						"allOf": [
-							{
-								"if": {
-									"properties": {
-										"command": {
-											"const": "pickcommand.runInChildProcess"
-										}
-									}
-								},
-								"then": {
-									"properties": {
-										"script": {},
-										"separator": {},
-										"encoding": {},
-										"shell": {},
-										"maxBuffer": {},
-										"killSignal": {},
-										"windowsHide": {},
-										"timeout": {},
-										"uid": {},
-										"gid": {},
-										"cwd": {},
-										"env": {}
-									},
-									"required": [
-										"script"
-									]
-								}
-							},
-							{
-								"if": {
-									"properties": {
-										"command": {
-											"const": "pickcommand.runInJs"
-										}
-									}
-								},
-								"then": {
-									"properties": {
-										"script": {},
-										"separator": {}
-									}
-								}
-							},
-							{
-								"if": {
-									"properties": {
-										"command": {
-											"const": "pickcommand.runInTerminal"
-										}
-									}
-								},
-								"then": {
-									"properties": {
-										"script": {},
-										"separator": {},
-										"terminal": {}
-									}
-								}
-							},
-							{
-								"if": {
-									"properties": {
-										"command": {
-											"const": "pickcommand.showCommands"
-										}
-									}
-								},
-								"then": {
-									"properties": {
-										"commands": {
-											"type": "object"
-										}
-									},
-									"required": [
-										"commands"
-									]
-								}
-							},
-							{
-								"if": {
-									"properties": {
-										"command": {
-											"const": "pickcommand.createCommand"
-										}
-									}
-								},
-								"then": {
-									"properties": {
-										"value": {},
-										"args": {
-											"type": "array"
-										}
-									},
-									"required": [
-										"value"
-									]
-								}
-							}
-						]
-					}
-				},
-				"pickcommand.shortcut1": {
+				"pickcommand.directory": {
 					"type": "string",
-					"markdownDescription": "The key of the `#pickcommand.commands#` associated with."
-				},
-				"pickcommand.shortcut2": {
-					"type": "string",
-					"markdownDescription": "The key of the `#pickcommand.commands#` associated with."
-				},
-				"pickcommand.shortcut3": {
-					"type": "string",
-					"markdownDescription": "The key of the `#pickcommand.commands#` associated with."
-				},
-				"pickcommand.shortcut4": {
-					"type": "string",
-					"markdownDescription": "The key of the `#pickcommand.commands#` associated with."
-				},
-				"pickcommand.shortcut5": {
-					"type": "string",
-					"markdownDescription": "The key of the `#pickcommand.commands#` associated with."
-				},
-				"pickcommand.shortcut6": {
-					"type": "string",
-					"markdownDescription": "The key of the `#pickcommand.commands#` associated with."
-				},
-				"pickcommand.shortcut7": {
-					"type": "string",
-					"markdownDescription": "The key of the `#pickcommand.commands#` associated with."
-				},
-				"pickcommand.shortcut8": {
-					"type": "string",
-					"markdownDescription": "The key of the `#pickcommand.commands#` associated with."
-				},
-				"pickcommand.shortcut9": {
-					"type": "string",
-					"markdownDescription": "The key of the `#pickcommand.commands#` associated with."
+					"markdownDescription": "The directory which holds scripts."
 				}
 			}
 		},
 		"commands": [
 			{
-				"command": "pickcommand.pickAllCommand",
-				"title": "Pick all commands",
-				"category": "PickCommand"
-			},
-			{
-				"command": "pickcommand.pickDefaultCommand",
-				"title": "Pick default command",
-				"category": "PickCommand"
-			},
-			{
-				"command": "pickcommand.shortcut1",
-				"title": "Pick command shortcut1",
-				"category": "PickCommand"
-			},
-			{
-				"command": "pickcommand.shortcut2",
-				"title": "Pick command shortcut2",
-				"category": "PickCommand"
-			},
-			{
-				"command": "pickcommand.shortcut3",
-				"title": "Pick command shortcut3",
-				"category": "PickCommand"
-			},
-			{
-				"command": "pickcommand.shortcut4",
-				"title": "Pick command shortcut4",
-				"category": "PickCommand"
-			},
-			{
-				"command": "pickcommand.shortcut5",
-				"title": "Pick command shortcut5",
-				"category": "PickCommand"
-			},
-			{
-				"command": "pickcommand.shortcut6",
-				"title": "Pick command shortcut6",
-				"category": "PickCommand"
-			},
-			{
-				"command": "pickcommand.shortcut7",
-				"title": "Pick command shortcut7",
-				"category": "PickCommand"
-			},
-			{
-				"command": "pickcommand.shortcut8",
-				"title": "Pick command shortcut8",
-				"category": "PickCommand"
-			},
-			{
-				"command": "pickcommand.shortcut9",
-				"title": "Pick command shortcut9",
+				"command": "pickcommand.commands",
+				"title": "Pick Commands",
 				"category": "PickCommand"
 			}
 		],
 		"menus": {
 			"explorer/context": [
 				{
-					"command": "pickcommand.pickAllCommand",
-					"alt": "pickcommand.pickDefaultCommand",
+					"command": "pickcommand.commands",
 					"group": "navigation"
 				}
 			],
 			"editor/title/context": [
 				{
-					"command": "pickcommand.pickAllCommand",
-					"alt": "pickcommand.pickDefaultCommand",
+					"command": "pickcommand.commands",
 					"group": "navigation"
 				}
 			],
 			"scm/resourceFolder/context": [
 				{
-					"command": "pickcommand.pickAllCommand",
-					"alt": "pickcommand.pickDefaultCommand",
+					"command": "pickcommand.commands",
 					"group": "navigation"
 				}
 			],
 			"scm/resourceState/context": [
 				{
-					"command": "pickcommand.pickAllCommand",
-					"alt": "pickcommand.pickDefaultCommand",
+					"command": "pickcommand.commands",
 					"group": "navigation"
 				}
 			]
