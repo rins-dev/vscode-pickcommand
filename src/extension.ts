@@ -57,7 +57,7 @@ function loadPickCommands(dir: string): StoreCommand[] {
 	return commands;
 }
 
-async function executeValueType<T>(action: ValueType<T>, args: unknown[]): Promise<T> {
+function executeAction<T>(action: ValueType<T>, args: unknown[]): T | Promise<T> {
 	if (typeof action === 'function') {
 		return (action as (...args: unknown[]) => T | Promise<T>)(...args);
 	} else {
@@ -70,14 +70,14 @@ async function makePickItem(store: StoreCommand, args: unknown[]): Promise<PickI
 		await store.command.init(...args);
 	}
 	if (store.command.when) {
-		const when = await executeValueType(store.command.when, args);
+		const when = await executeAction(store.command.when, args);
 		if (!when) return undefined;
 	}
 
-	const label = store.command.label !== undefined ? await executeValueType(store.command.label, args) : path.basename(store.file);
-	const description = store.command.description !== undefined ? await executeValueType(store.command.description, args) : undefined;
-	const detail = store.command.detail !== undefined ? await executeValueType(store.command.detail, args) : undefined;
-	const order = store.command.order !== undefined ? await executeValueType(store.command.order, args) : 0;
+	const label = store.command.label !== undefined ? await executeAction(store.command.label, args) : path.basename(store.file);
+	const description = store.command.description !== undefined ? await executeAction(store.command.description, args) : undefined;
+	const detail = store.command.detail !== undefined ? await executeAction(store.command.detail, args) : undefined;
+	const order = store.command.order !== undefined ? await executeAction(store.command.order, args) : 0;
 	const command = store.command;
 
 	return {
