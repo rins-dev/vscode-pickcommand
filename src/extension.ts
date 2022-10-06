@@ -4,11 +4,14 @@ import * as fs from "fs";
 import * as path from "path";
 import * as vscode from 'vscode';
 
+type ValueType<T> = T | Promise<T> | ((...args: unknown[]) => T | Promise<T>);
 interface PickCommand {
-	when?: (...args: unknown[]) => boolean | Promise<boolean>;
-	label?: (...args: unknown[]) => string | Promise<string>;
-	description?: (...args: unknown[]) => string | undefined | Promise<string | undefined>;
-	detail?: (...args: unknown[]) => string | undefined | Promise<string | undefined>;
+	init?: (...args: unknown[]) => void | Promise<void>;
+	when?: ValueType<boolean>;
+	label?: ValueType<string>;
+	description?: ValueType<string | undefined>;
+	detail?: ValueType<string | undefined>;
+	order?: ValueType<number>;
     pickcommand: (...args: unknown[]) => any;
 }
 
@@ -21,6 +24,7 @@ interface PickItem {
 	label: string,
 	description: string | undefined,
 	detail: string | undefined,
+	order: number,
 	command: PickCommand
 }
 
@@ -53,19 +57,34 @@ function loadPickCommands(dir: string): StoreCommand[] {
 	return commands;
 }
 
-async function makePickItem(store: StoreCommand, args: unknown[]): Promise<PickItem | undefined> {
-	const when = await store.command.when?.(...args) ?? true;
-	if (!when) return undefined;
+async function executeValueType<T>(action: ValueType<T>, args: unknown[]): Promise<T> {
+	if (typeof action === 'function') {
+		return (action as (...args: unknown[]) => T | Promise<T>)(...args);
+	} else {
+		return action;
+	}
+}
 
-	const label = await store.command.label?.(...args) ?? path.basename(store.file);
-	const description = await store.command.description?.(...args);
-	const detail = await store.command.detail?.(...args);
+async function makePickItem(store: StoreCommand, args: unknown[]): Promise<PickItem | undefined> {
+	if (store.command.init) {
+		await store.command.init(...args);
+	}
+	if (store.command.when) {
+		const when = await executeValueType(store.command.when, args);
+		if (!when) return undefined;
+	}
+
+	const label = store.command.label !== undefined ? await executeValueType(store.command.label, args) : path.basename(store.file);
+	const description = store.command.description !== undefined ? await executeValueType(store.command.description, args) : undefined;
+	const detail = store.command.detail !== undefined ? await executeValueType(store.command.detail, args) : undefined;
+	const order = store.command.order !== undefined ? await executeValueType(store.command.order, args) : 0;
 	const command = store.command;
 
 	return {
 		label,
 		description,
 		detail,
+		order,
 		command
 	};
 }
@@ -91,7 +110,7 @@ export function activate(context: vscode.ExtensionContext) {
 				return vscode.window.showWarningMessage(`No pickcommands matched.`);
 			}
 
-			const item = await vscode.window.showQuickPick(pickitems);
+			const item = await vscode.window.showQuickPick(pickitems.sort((a,b) => a.order - b.order));
 			if (item === undefined) return;
 			return item.command.pickcommand(...args);
 		} catch (err) {
