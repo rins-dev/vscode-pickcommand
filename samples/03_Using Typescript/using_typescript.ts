@@ -4,16 +4,17 @@ import { createContext } from "./context";
 
 let context: ReturnType<typeof createContext>;
 
-export function when(...args: unknown[]) {
+export function init(...args: unknown[]) {
     context = createContext(...args);
+}
+
+export function when(...args: unknown[]) {
     if (context.SELECTED_FILE === undefined) return false;
     if (context.SELECTED_FILE.fsPath.endsWith(`.js`)) return false;
     return true;
 }
 
-export function label() {
-    return `Open ${path.basename(context.SELECTED_FILE!.fsPath)}`;
-}
+export const label = () => `Open ${path.basename(context.SELECTED_FILE!.fsPath)}`;
 
 export function pickcommand() {
     vscode.window.showInformationMessage(context.SELECTED_FILE!.fsPath);

@@ -4,15 +4,16 @@ import * as fs from "fs";
 import * as path from "path";
 import * as vscode from 'vscode';
 
-type ValueType<T> = T | Promise<T> | ((...args: unknown[]) => T | Promise<T>);
+type ValueType<T> =((...args: unknown[]) => T | Promise<T>);
+
 interface PickCommand {
-	init?: (...args: unknown[]) => void | Promise<void>;
+	init?: ValueType<void>;
 	when?: ValueType<boolean>;
 	label?: ValueType<string>;
 	description?: ValueType<string | undefined>;
 	detail?: ValueType<string | undefined>;
 	order?: ValueType<number>;
-    pickcommand: (...args: unknown[]) => any;
+    pickcommand: ValueType<any>;
 }
 
 interface StoreCommand {
@@ -32,7 +33,13 @@ interface PickItem {
 function isPickCommand(obj: unknown): obj is PickCommand {
     if (typeof obj !== 'object' || obj === null) return false;
 	const command = obj as PickCommand;
-	return typeof command.pickcommand === 'function';
+	return typeof command.pickcommand === 'function'
+		&& (command.init === undefined || typeof command.init === 'function')
+		&& (command.when === undefined || typeof command.when === 'function')
+		&& (command.label === undefined || typeof command.label === 'function')
+		&& (command.description === undefined || typeof command.description === 'function')
+		&& (command.detail === undefined || typeof command.detail === 'function')
+		&& (command.order === undefined || typeof command.order === 'function');
 }
 
 function loadPickCommand(file: string): StoreCommand | undefined {
@@ -57,27 +64,19 @@ function loadPickCommands(dir: string): StoreCommand[] {
 	return commands;
 }
 
-function executeAction<T>(action: ValueType<T>, args: unknown[]): T | Promise<T> {
-	if (typeof action === 'function') {
-		return (action as (...args: unknown[]) => T | Promise<T>)(...args);
-	} else {
-		return action;
-	}
-}
 
 async function makePickItem(store: StoreCommand, args: unknown[]): Promise<PickItem | undefined> {
-	if (store.command.init) {
-		await store.command.init(...args);
-	}
+	await store.command.init?.(...args);
+	
 	if (store.command.when) {
-		const when = await executeAction(store.command.when, args);
+		const when = await store.command.when(...args);
 		if (!when) return undefined;
 	}
 
-	const label = store.command.label !== undefined ? await executeAction(store.command.label, args) : path.basename(store.file);
-	const description = store.command.description !== undefined ? await executeAction(store.command.description, args) : undefined;
-	const detail = store.command.detail !== undefined ? await executeAction(store.command.detail, args) : undefined;
-	const order = store.command.order !== undefined ? await executeAction(store.command.order, args) : 0;
+	const label = await store.command.label?.(...args) ?? path.basename(store.file);
+	const description = await store.command.description?.(...args);
+	const detail = await store.command.detail?.(...args);
+	const order = await store.command.order?.(...args) ?? 0;
 	const command = store.command;
 
 	return {
