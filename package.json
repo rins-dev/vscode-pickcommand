@@ -1,61 +1,59 @@
 {
 	"name": "pickcommand",
 	"displayName": "PickCommand",
-	"description": "Easy to run configured scripts with quick pick.",
-	"version": "0.9.1",
+	"description": "Run configured scripts with quick pick.",
+	"version": "0.9.8",
 	"publisher": "rins",
 	"repository": {
-		"url": "https://github.com/rins-dev/vscode-pickcommand"
+		"type": "git",
+		"url": "https://github.com/rins-dev/vscode-pickcommand.git"
 	},
+	"bugs": {
+		"url": "https://github.com/rins-dev/vscode-pickcommand/issues"
+	},
+	"homepage": "https://github.com/rins-dev/vscode-pickcommand/blob/main/README.md",
 	"engines": {
-		"vscode": "^1.46.0"
+		"vscode": "^1.75.0"
 	},
 	"categories": [
 		"Other"
 	],
-	"activationEvents": [
-		"onCommand:pickcommand.commands"
-	],
 	"main": "./out/extension.js",
 	"contributes": {
-		"configuration": {
-			"title": "PickCommand",
-			"properties": {
-				"pickcommand.directory": {
-					"type": "string",
-					"markdownDescription": "The directory which holds scripts."
-				}
-			}
-		},
 		"commands": [
 			{
-				"command": "pickcommand.commands",
-				"title": "Pick Commands",
-				"category": "PickCommand"
+				"command": "pickcommand.executecommands",
+				"title": "Execute commands",
+				"category": "PickCommands"
+			},
+			{
+				"command": "pickcommand.writecommands",
+				"title": "Write commands",
+				"category": "PickCommands"
 			}
 		],
 		"menus": {
 			"explorer/context": [
 				{
-					"command": "pickcommand.commands",
+					"command": "pickcommand.executecommands",
 					"group": "navigation"
 				}
 			],
 			"editor/title/context": [
 				{
-					"command": "pickcommand.commands",
+					"command": "pickcommand.executecommands",
 					"group": "navigation"
 				}
 			],
 			"scm/resourceFolder/context": [
 				{
-					"command": "pickcommand.commands",
+					"command": "pickcommand.executecommands",
 					"group": "navigation"
 				}
 			],
 			"scm/resourceState/context": [
 				{
-					"command": "pickcommand.commands",
+					"command": "pickcommand.executecommands",
 					"group": "navigation"
 				}
 			]
@@ -85,5 +83,8 @@
 		"mocha": "^8.1.3",
 		"typescript": "^4.1.2",
 		"vscode-test": "^1.4.1"
+	},
+	"dependencies": {
+		"pickcommand": "file:"
 	}
 }

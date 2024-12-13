@@ -1,6 +1,10 @@
 # Change Log
 
-## [0.1.2] - 2010-05-12
+## [0.9.8] - 2024-12-13
+
+- Redesign the extension. Now it only support `js` file configuration.
+
+## [0.1.2] - 2021-05-12
 
 - Add some useful functions.
 

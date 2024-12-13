@@ -1,0 +1,14 @@
+[{
+    "label": "first",
+    "host": "192.168.0.1"
+}, {
+    "label": "jump server",
+    "host": "192.168.0.2",
+    "port": 22,
+    "username": "rins",
+    "args": "-i ./env/id_rsa -L 20022:192.168.0.1:22"
+}, {
+    "label": "second",
+    "host": "127.0.0.1",
+    "port": "20022"
+}]
