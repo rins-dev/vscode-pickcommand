@@ -2,7 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as vscode from 'vscode';
 import { VSC } from "./common";
-import { Converter } from "./converters";
+import { Converter, Writable } from "./converters";
 import { PickCommand, PickContext, PickItem } from "../docs/samples/pickcommand";
 
 interface VSCPickItem extends PickItem {
@@ -26,7 +26,7 @@ interface PickCommandFolder {
 
 function createContext(args: unknown[]): PickContext {
 	// used for commandPalette
-	const context: PickContext = {
+	const context: Writable<PickContext> = {
 		ARGUMENTS: args,
 		SELECTED_FILE: undefined,
 		SELECTED_FILES: [],
@@ -44,32 +44,23 @@ function createContext(args: unknown[]): PickContext {
         if (is_uri(arg0)) {
             if (is_uri_array(arg1)) {
 				// used for explorer/context
-				return {
-					...context,
-					SELECTED_FILE: arg0,
-					SELECTED_FILES: arg1
-				};
+				context.SELECTED_FILE = arg0;
+				context.SELECTED_FILES = arg1;
             } else {
 				// used for editor/title/context
-				return {
-					...context,
-					SELECTED_FILE: arg0,
-					SELECTED_FILES: [arg0]
-				};
+				context.SELECTED_FILE = arg0;
+				context.SELECTED_FILES = [ arg0 ];
             }
         } else {
             const resources = args.map((x: any) => (x as vscode.SourceControlResourceState).resourceUri);
             if (is_uri_array(resources)) {
                 // USED for scm/resourceState/context & scm/resourceFolder/context
-				return {
-					...context,
-					SELECTED_FILE: resources[0],
-					SELECTED_FILES: resources
-				};
+				context.SELECTED_FILE = resources[0];
+				context.SELECTED_FILES = resources;
             }
         }
     }
-    return context;
+    return context as PickContext;
 }
 
 async function loadPickItem(file: PickCommandFile, args: unknown[]): Promise<VSCPickItem | false | undefined> {

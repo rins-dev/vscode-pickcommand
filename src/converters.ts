@@ -4,8 +4,13 @@ type KeyTypeOf<T, ValueType> = {
     [K in keyof T]: T[K] extends ValueType ? K : never
 }[keyof T];
 
+export type Writable<T> = {
+	-readonly [K in keyof T]: T[K] extends Record<any, any> ? Writable<T[K]> : T[K]
+};
+
 
 export type RFunction<TArgs extends any[] = [], TResult = void> = (...args: TArgs) => TResult;
+
 
 
 export namespace Converter {
